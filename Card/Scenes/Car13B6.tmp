@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccmxd4wegnilg"]
+
+[ext_resource type="Script" path="res://Card/Script/Card.gd" id="1_1ksw1"]
+
+[node name="Card" type="CharacterBody2D"]
+position = Vector2(519, 264)
+script = ExtResource("1_1ksw1")
