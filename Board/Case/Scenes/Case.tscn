@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8qrfuoxqcbue"]
+[gd_scene load_steps=2 format=3 uid="uid://b0uxwqbencmr7"]
 
 [ext_resource type="Script" path="res://Board/Case/Scripts/Case.gd" id="1_bh7ul"]
 
-[node name="Case" type="Control"]
-layout_mode = 3
-anchors_preset = 0
+[node name="Case" type="Area2D"]
 script = ExtResource("1_bh7ul")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
