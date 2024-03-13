@@ -5,9 +5,9 @@
 
 [node name="TetraMaster" type="Node2D"]
 
+[node name="Board" parent="." instance=ExtResource("2_mmaen")]
+unique_name_in_owner = true
+
 [node name="GameEngine" type="Node2D" parent="."]
 script = ExtResource("1_lv8d5")
 metadata/_edit_lock_ = true
-
-[node name="Board" parent="." instance=ExtResource("2_mmaen")]
-unique_name_in_owner = true
