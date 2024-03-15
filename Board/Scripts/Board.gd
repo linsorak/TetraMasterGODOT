@@ -24,32 +24,44 @@ func _ready():
 			var case_position = Vector2(start_x + col * (case_width + spacing), start_y + row * (case_height + spacing))
 			case_instance.position = case_position
 			case_instance.set_size(Vector2(case_width, case_height))
+			case_instance.name = "Case_" + str(row) + "_" + str(col) 
 			add_child(case_instance)
+	_generate_blocks()
+			
+func _generate_blocks() -> void:
+	var nb_blocks = randi_range(0, 5)
+	var base_block = load("res://Board/Block/Scenes/Block.tscn")
+	var selected_blocks_list = []
+
+	
+	for i in range(nb_blocks):
+		var random_position = Vector2(randi() % num_rows, randi() % num_cols)		
+		while selected_blocks_list.find(random_position) != -1:
+			random_position = Vector2(randi() % num_rows, randi() % num_cols)
+		
+		selected_blocks_list.append(random_position)
+		var block = base_block.instantiate()
+		add_child(block)
+		block.rescale(Vector2(case_width, case_height))
+		var case = get_node("Case_" + str(random_position.x) + "_" + str(random_position.y))		
+		if case:
+			block.position = case.position
+			case.set_item(block)		
+	
 			
 func _set_board_background_img() -> void:
 	var image = Sprite2D.new()
 	var texture = load(background_image)
 	var texture_size = texture.get_size()
-	var screen_size = get_viewport_rect().size
-	
-	print("Taille de la fenêtre:", screen_size)
-	
+	var screen_size = get_viewport_rect().size	
 	var target_height = screen_size.y
 	var scale_factor = target_height / texture_size.y
-	
 	image.texture = texture
 	image.scale = Vector2(scale_factor, scale_factor)
-	
-	# Obtenez la taille de l'image après mise à l'échelle
 	var image_size = texture_size * scale_factor
-	
-	print("Taille de l'image:", image_size)
-	
 	image.position.x = (screen_size.x - image_size.x) / 2 + (image_size.x / 2)
 	image.position.y = (screen_size.y - image_size.y) / 2 + (image_size.y / 2) 
-	
-	print("Position de l'image:", image.position)
-	
+		
 	add_child(image)
 
 

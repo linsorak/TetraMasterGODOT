@@ -2,10 +2,12 @@ class_name Case
 extends Area2D
 
 var border_size = 2
+var _item = null: set = set_item, get = get_item
 
 func _ready():
 	$Panel.connect("mouse_entered", Callable(self, "_on_case_mouse_entered"))
 	$Panel.connect("mouse_exited", Callable(self, "_on_case_mouse_exited"))
+	z_index = 127
 
 func set_size(case_size: Vector2) -> void:
 	$Panel.size = case_size
@@ -26,8 +28,18 @@ func set_size(case_size: Vector2) -> void:
 	$Panel.get_theme_stylebox("panel").bg_color = Color.TRANSPARENT
 
 func _on_case_mouse_entered():
-	$Panel.get_theme_stylebox("panel").border_color = Color.FLORAL_WHITE 
+	if get_item():
+		$Panel.get_theme_stylebox("panel").border_color = Color.RED 
+	else:	
+		$Panel.get_theme_stylebox("panel").border_color = Color.FLORAL_WHITE 
 
 func _on_case_mouse_exited():
 	$Panel.get_theme_stylebox("panel").border_color = Color.TRANSPARENT 
 	
+#ACCESSORS :
+
+func set_item(item) -> void:
+	_item = item
+	
+func get_item():
+	return _item

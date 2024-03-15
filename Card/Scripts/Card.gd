@@ -188,23 +188,23 @@ func _generate_number(number_value: String) -> Label:
 	number.text = number_value
 	return number
 
-func _unhandled_input(event):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.is_pressed():
-				var mouse_pos = get_global_mouse_position()
-				var border_size = border.region_rect.size * scale_value
-				var border_rect = Rect2(global_position.x, global_position.y, border_size.x, border_size.y)
-				if border_rect.has_point(mouse_pos):
-					dragging = true
-					drag_position = mouse_pos - global_position
-					set_as_top_level(true)
-					emit_signal("card_drag_started", self)
-			else:
-				dragging = false
-				set_as_top_level(false)
-				emit_signal("card_drag_ended", self)
-
-	elif event is InputEventMouseMotion:
-		if dragging:
-			global_position = get_global_mouse_position() - drag_position
+#func _unhandled_input(event):
+	#if event is InputEventMouseButton:
+		#if event.button_index == MOUSE_BUTTON_LEFT:
+			#if event.is_pressed():
+				#var mouse_pos = get_global_mouse_position()
+				#var border_size = border.region_rect.size * scale_value
+				#var border_rect = Rect2(global_position.x, global_position.y, border_size.x, border_size.y)
+				#if border_rect.has_point(mouse_pos):
+					#dragging = true
+					#drag_position = mouse_pos - global_position
+					#set_as_top_level(true)
+					#emit_signal("card_drag_started", self)
+			#else:
+				#dragging = false
+				#set_as_top_level(false)
+				#emit_signal("card_drag_ended", self)
+#
+	#elif event is InputEventMouseMotion:
+		#if dragging:
+			#global_position = get_global_mouse_position() - drag_position
