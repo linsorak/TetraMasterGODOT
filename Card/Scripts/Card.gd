@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends Area2D
 class_name Card
 
 enum COLOR {
@@ -10,7 +10,6 @@ enum COLOR {
 
 @export var width: float = 150.0
 @export var height: float = 150.0
-@export var scale_value: float = 0.3
 @export var color: COLOR = COLOR.BLUE
 
 var background = Sprite2D.new()
@@ -24,7 +23,10 @@ var drag_position = Vector2.ZERO
 var dragging = false
 var numbers: Array[String]
 
-signal card_drag_started
+var _scale_w: float
+var _scale_h: float
+
+signal card_selected(selected_card)
 
 func _init():
 	_card_sheet = preload("res://Card/Sprites/TetraMasterCardAssets.png")
@@ -35,26 +37,36 @@ func _init():
 	add_child(background)
 	add_child(illustration)
 	add_child(border)
-	processing_arrows()
 
 func _ready():
-	pass
+	connect("input_event", Callable(self, "_on_card_click"))
+	
 
-func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array[String], card_illustration: Array[int]) -> void:
-	set_arrows(card_arrows)
+func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array[String], card_illustration: Array[int], case_dimensions: Vector2) -> void:
 	color = card_color
 	numbers = card_numbers
 	update_color()
+	_scale_w = case_dimensions.x / border.get_rect().size.x 
+	_scale_h = case_dimensions.y / border.get_rect().size.y	
+	processing_arrows()
+	set_arrows(card_arrows)
 	initialize_numbers()
 	place_numbers()
 	rescale()
 	set_illustration(card_illustration[0], card_illustration[1])
+	var collision_shape = $CollisionShape2D.shape as RectangleShape2D
+	if collision_shape == null:
+		collision_shape = RectangleShape2D.new()
+		$CollisionShape2D.shape = collision_shape
+		
+	collision_shape.extents = Vector2(border.get_rect().size.x, border.get_rect().size.y) / 2
+	$CollisionShape2D.position = Vector2(get_width(), get_height()) / 2 
 
 func rescale() -> void:
 	for child in get_children():
 		if child is Sprite2D:
-			child.centered = false  # Centre le sprite
-		child.scale = Vector2(scale_value, scale_value)
+			child.centered = false
+		child.scale = Vector2(_scale_w, _scale_h)
 
 func set_illustration(x: int, y: int) -> void:
 	var sheet_row_width = int(_illustration_img.get_width() / 12.0)
@@ -64,8 +76,8 @@ func set_illustration(x: int, y: int) -> void:
 	var region_illustration = Rect2(Vector2(position_x, position_y), Vector2(sheet_row_width, sheet_column_height))
 	_add_texture(_illustration_img, illustration, region_illustration)
 	illustration.region_enabled = true
-	var scale_w = (border.get_rect().size.x * scale_value) / sheet_row_width
-	var scale_h = (border.get_rect().size.y * scale_value) / sheet_column_height
+	var scale_w = (border.get_rect().size.x * _scale_w) / sheet_row_width
+	var scale_h = (border.get_rect().size.y * _scale_h) / sheet_column_height
 	illustration.scale = Vector2(scale_w, scale_h)
 
 
@@ -92,23 +104,23 @@ func set_arrows(card_arrows: Array[bool]) -> void:
 
 func processing_arrows() -> void:
 	var arrow_data = [
-		{"position": Vector2(115, 32), "rotation": 135, "name": "top_left"},
-		{"position": Vector2(371, 80), "rotation": 180, "name": "top_middle"},
-		{"position": Vector2(595, 118), "rotation": 225, "name": "top_right"},
-		{"position": Vector2(76, 348), "rotation": 90, "name": "midle_left"},
-		{"position": Vector2(549, 465), "rotation": 270, "name": "midle_right"},
-		{"position": Vector2(31, 696), "rotation": 45, "name": "bottom_left"},
-		{"position": Vector2(253, 733), "rotation": 0, "name": "bottom_middle"},
-		{"position": Vector2(510, 780), "rotation": 315, "name": "bottom_right"}
-	]
+		{"position": Vector2(115 * _scale_w, 32 * _scale_h), "rotation": 135, "name": "top_left"},
+		{"position": Vector2(371 * _scale_w, 80 * _scale_h), "rotation": 180, "name": "top_middle"},
+		{"position": Vector2(595 * _scale_w, 118 * _scale_h), "rotation": 225, "name": "top_right"},
+		{"position": Vector2(76 * _scale_w, 348 * _scale_h), "rotation": 90, "name": "midle_left"},
+		{"position": Vector2(549 * _scale_w, 465 * _scale_h), "rotation": 270, "name": "midle_right"},
+		{"position": Vector2(31 * _scale_w, 696 * _scale_h), "rotation": 45, "name": "bottom_left"},
+		{"position": Vector2(253 * _scale_w, 733 * _scale_h), "rotation": 0, "name": "bottom_middle"},
+		{"position": Vector2(510 * _scale_w, 780 * _scale_h), "rotation": 315, "name": "bottom_right"}
+	]	
 
 	for i in range(len(arrow_data)):
 		var arrow = Sprite2D.new()
 		var temp_texture = preload("res://Card/Sprites/arrow.png")	
-
+		arrow.centered = false
 		arrow.texture = temp_texture
 		arrow.name = arrow_data[i]["name"]
-		arrow.position = arrow_data[i]["position"] * scale_value
+		arrow.position = arrow_data[i]["position"]
 		arrow.rotate(deg_to_rad(arrow_data[i]["rotation"]))
 		add_child(arrow)
 
@@ -133,16 +145,16 @@ func place_numbers() -> void:
 	var sizes = []
 	var heights = []
 	var positions = []
-	var space_between_number = 20 * scale_value
+	var space_between_number = 20 * ((_scale_w + _scale_h) / 2)
 	var total_sizes = 0
-	var width_card = border.region_rect.size.x * scale_value
+	var width_card = border.region_rect.size.x * _scale_w
 
 
 	for node in nodes:
 		var node_ref = get_node(node)
 		if node_ref:
-			var node_size = node_ref.get_size().x * scale_value
-			var node_height = node_ref.get_size().y * scale_value
+			var node_size = node_ref.get_size().x * _scale_w
+			var node_height = node_ref.get_size().y * _scale_h
 			sizes.append(node_size)
 			heights.append(node_height)
 			total_sizes += node_size
@@ -158,7 +170,7 @@ func place_numbers() -> void:
 		var offset = offset_size + (space_between_number * i) + sum_size
 		positions.append(offset)
 
-	var border_height = border.region_rect.size.y * scale_value
+	var border_height = border.region_rect.size.y * _scale_h
 	var position_value = 0
 
 	for value in positions:
@@ -188,23 +200,12 @@ func _generate_number(number_value: String) -> Label:
 	number.text = number_value
 	return number
 
-#func _unhandled_input(event):
-	#if event is InputEventMouseButton:
-		#if event.button_index == MOUSE_BUTTON_LEFT:
-			#if event.is_pressed():
-				#var mouse_pos = get_global_mouse_position()
-				#var border_size = border.region_rect.size * scale_value
-				#var border_rect = Rect2(global_position.x, global_position.y, border_size.x, border_size.y)
-				#if border_rect.has_point(mouse_pos):
-					#dragging = true
-					#drag_position = mouse_pos - global_position
-					#set_as_top_level(true)
-					#emit_signal("card_drag_started", self)
-			#else:
-				#dragging = false
-				#set_as_top_level(false)
-				#emit_signal("card_drag_ended", self)
-#
-	#elif event is InputEventMouseMotion:
-		#if dragging:
-			#global_position = get_global_mouse_position() - drag_position
+func get_height() -> float:
+	return border.region_rect.size.y * _scale_h
+	
+func get_width() -> float:
+	return border.region_rect.size.x * _scale_w
+
+func _on_card_click(_viewport, event, _shape_idx):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		emit_signal("card_selected", self)

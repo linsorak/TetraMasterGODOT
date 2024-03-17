@@ -16,4 +16,3 @@ func rescale(case_size: Vector2) -> void:
 	var scale_y = case_size.y / $Sprite2D.texture.get_height()
 	$Sprite2D.scale.x = scale_x
 	$Sprite2D.scale.y = scale_y
-	print(scale_x)
