@@ -40,7 +40,6 @@ func _generate_blocks() -> void:
 	var nb_blocks = randi_range(0, 6)
 	var base_block = load("res://Board/Block/Scenes/Block.tscn")
 	var selected_blocks_list = []
-
 	
 	for i in range(nb_blocks):
 		var random_position = Vector2(randi() % num_rows, randi() % num_cols)		

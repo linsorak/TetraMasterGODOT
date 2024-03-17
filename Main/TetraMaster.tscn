@@ -9,5 +9,6 @@
 unique_name_in_owner = true
 
 [node name="GameEngine" type="Node2D" parent="."]
+unique_name_in_owner = true
 script = ExtResource("1_lv8d5")
 metadata/_edit_lock_ = true

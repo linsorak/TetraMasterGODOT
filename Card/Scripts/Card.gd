@@ -3,9 +3,7 @@ class_name Card
 
 enum COLOR {
 	BLUE,
-	RED,
-	GREEN,
-	PURPLE
+	RED
 }
 
 @export var width: float = 150.0
@@ -20,13 +18,14 @@ var _illustration_img : Texture
 var _arrow_img : Texture
 var arrows : Array[Sprite2D]
 var drag_position = Vector2.ZERO
-var dragging = false
 var numbers: Array[String]
 
 var _scale_w: float
 var _scale_h: float
+var _selected = false
 
 signal card_selected(selected_card)
+signal card_unselected(selected_card)
 
 func _init():
 	_card_sheet = preload("res://Card/Sprites/TetraMasterCardAssets.png")
@@ -36,7 +35,7 @@ func _init():
 	height = _illustration_img.get_height()
 	add_child(background)
 	add_child(illustration)
-	add_child(border)
+	add_child(border)	
 
 func _ready():
 	connect("input_event", Callable(self, "_on_card_click"))
@@ -182,8 +181,8 @@ func place_numbers() -> void:
 		get_node(nodes[i]).position = Vector2(positions[i], offset_top)
 
 func _add_texture(img: Texture, sprite: Sprite2D, region: Rect2) -> void:
-	var image = img.get_image()  # Obtenez les données de l'image à partir de la texture
-	var temp_texture = ImageTexture.create_from_image(image)  # Créez une nouvelle texture à partir de l'image
+	var image = img.get_image()
+	var temp_texture = ImageTexture.create_from_image(image)
 	sprite.texture = temp_texture
 	sprite.region_enabled = true
 	sprite.region_rect = region
@@ -201,11 +200,16 @@ func _generate_number(number_value: String) -> Label:
 	return number
 
 func get_height() -> float:
-	return border.region_rect.size.y * _scale_h
+	return border.region_rect.size.y * _scale_h	
 	
 func get_width() -> float:
 	return border.region_rect.size.x * _scale_w
 
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		emit_signal("card_selected", self)
+		if _selected:
+			emit_signal("card_unselected", self)
+			_selected = false
+		else:
+			emit_signal("card_selected", self)
+			_selected = true
