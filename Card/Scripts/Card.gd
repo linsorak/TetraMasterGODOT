@@ -23,6 +23,7 @@ var numbers: Array[String]
 var _scale_w: float
 var _scale_h: float
 var _selected = false
+var _can_be_selected = false : set = set_can_be_selected, get = get_can_be_selected
 
 signal card_selected(selected_card)
 signal card_unselected(selected_card)
@@ -204,12 +205,21 @@ func get_height() -> float:
 	
 func get_width() -> float:
 	return border.region_rect.size.x * _scale_w
+	
+func set_can_be_selected(value: bool) -> void:
+	_can_be_selected = value
+	
+func get_can_be_selected() -> bool:
+	return _can_be_selected
 
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _selected:
-			emit_signal("card_unselected", self)
-			_selected = false
+		if get_can_be_selected():
+			if _selected:
+				emit_signal("card_unselected", self)
+				_selected = false
+			else:
+				emit_signal("card_selected", self)
+				_selected = true
 		else:
-			emit_signal("card_selected", self)
-			_selected = true
+			print("Can't be selected")

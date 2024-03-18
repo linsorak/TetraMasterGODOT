@@ -2,6 +2,7 @@ extends Node2D
 
 class_name Board
 
+
 var case_width = 182
 var case_height = 235
 var num_rows = 4
@@ -11,11 +12,15 @@ var spacing = 6
 var background_image : String = "res://Board/Sprites/board.png"
 var blue_deck: Array[Card]
 var red_deck: Array[Card]
+var cases: Array[Case]
 
 func _ready():
 	pass
 	
-func init_board() -> void:
+func init_board() -> void:	
+	var ratio = get_viewport_rect().size.x / 1920
+	case_width *= ratio
+	case_height *= ratio
 	_clear_children()
 	_set_board_background_img()
 	var grid_width = (case_width + spacing) * num_cols - spacing
@@ -32,6 +37,7 @@ func init_board() -> void:
 			case_instance.set_size(Vector2(case_width, case_height))
 			case_instance.name = "Case_" + str(row) + "_" + str(col) 
 			add_child(case_instance)
+			cases.append(case_instance)
 	_generate_blocks()
 	_generate_decks(Card.COLOR.BLUE, blue_deck)
 	_generate_decks(Card.COLOR.RED, red_deck)
@@ -128,6 +134,17 @@ func _clear_children():
 	for child in get_children():
 		child.queue_free()
 
-
-
-
+func _on_game_engine_current_player(current_player):
+	var blue_can_be_selected = false
+	var red_can_be_selected = false
+	if current_player == Card.COLOR.BLUE:
+		blue_can_be_selected = true
+	elif current_player == Card.COLOR.RED:
+		red_can_be_selected = true
+		
+	for card in blue_deck:
+		card.set_can_be_selected(blue_can_be_selected)
+		
+	for card in red_deck:
+		card.set_can_be_selected(red_can_be_selected) 
+			

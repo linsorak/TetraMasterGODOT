@@ -12,3 +12,5 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 script = ExtResource("1_lv8d5")
 metadata/_edit_lock_ = true
+
+[connection signal="current_player" from="GameEngine" to="Board" method="_on_game_engine_current_player"]
