@@ -99,6 +99,7 @@ func set_arrows(card_arrows: Array[bool]) -> void:
 	var arrow_data = ["top_left","top_middle", "top_right", "midle_left", "midle_right", "bottom_left", "bottom_middle", "bottom_right"]
 	for i in range(len(card_arrows)):
 		var arrow = get_node(arrow_data[i])
+		arrows.append(arrow)
 		if arrow:
 			arrow.visible = card_arrows[i]
 
@@ -180,6 +181,10 @@ func place_numbers() -> void:
 
 	for i in range(len(nodes)):
 		get_node(nodes[i]).position = Vector2(positions[i], offset_top)
+		
+func change_color(new_color: COLOR) -> void:
+	color = new_color
+	update_color()
 
 func _add_texture(img: Texture, sprite: Sprite2D, region: Rect2) -> void:
 	var image = img.get_image()
@@ -217,6 +222,33 @@ func set_selected(value: bool) -> void:
 
 func get_selected() -> bool:
 	return _selected
+	
+func get_power(power_value: String) -> Vector2i:
+	var power_list = [
+		{"power": "0", "min_value": 0, "max_value": 15},
+		{"power": "1", "min_value": 16, "max_value": 31},
+		{"power": "2", "min_value": 32, "max_value": 47},
+		{"power": "3", "min_value": 48, "max_value": 63},
+		{"power": "4", "min_value": 64, "max_value": 79},
+		{"power": "5", "min_value": 80, "max_value": 95},
+		{"power": "6", "min_value": 96, "max_value": 111},
+		{"power": "7", "min_value": 112, "max_value": 127},
+		{"power": "8", "min_value": 128, "max_value": 143},
+		{"power": "9", "min_value": 144, "max_value": 159},
+		{"power": "A", "min_value": 160, "max_value": 175},
+		{"power": "B", "min_value": 176, "max_value": 191},
+		{"power": "C", "min_value": 192, "max_value": 207},
+		{"power": "D", "min_value": 208, "max_value": 223},
+		{"power": "E", "min_value": 224, "max_value": 239},
+		{"power": "F", "min_value": 240, "max_value": 255}
+	]
+	
+	for power in power_list:
+		if power["power"] == power_value:
+			return Vector2i(power["min_value"], power["max_value"])
+	
+	return Vector2i(power_list[0]["min_value"], power_list[0]["max_value"])
+
 
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
