@@ -22,7 +22,7 @@ var numbers: Array[String]
 
 var _scale_w: float
 var _scale_h: float
-var _selected = false
+var _selected = false: set = set_selected, get = get_selected
 var _can_be_selected = false : set = set_can_be_selected, get = get_can_be_selected
 
 signal card_selected(selected_card)
@@ -211,6 +211,12 @@ func set_can_be_selected(value: bool) -> void:
 	
 func get_can_be_selected() -> bool:
 	return _can_be_selected
+	
+func set_selected(value: bool) -> void:
+	_selected = value
+
+func get_selected() -> bool:
+	return _selected
 
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

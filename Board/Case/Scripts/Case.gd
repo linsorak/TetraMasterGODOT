@@ -3,8 +3,10 @@ extends Area2D
 
 var border_size = 2
 var _item = null: set = set_item, get = get_item
+var _selected = false: set = set_selected, get = get_selected
 
 signal case_can_be_selected(selected_case)
+signal case_clicked(selected_case)
 
 func _ready():
 	$Panel.connect("mouse_entered", Callable(self, "_on_case_mouse_entered"))
@@ -31,8 +33,11 @@ func set_size(case_size: Vector2) -> void:
 	$Panel.get_theme_stylebox("panel").bg_color = Color.TRANSPARENT
 
 func _on_case_mouse_entered():
-	if get_item():
+	if not get_item():
 		emit_signal("case_can_be_selected", self)
+		
+		if get_selected():
+			$Panel.get_theme_stylebox("panel").border_color = Color.FLORAL_WHITE 
 		#$Panel.get_theme_stylebox("panel").border_color = Color.RED 
 	#else:	
 		#$Panel.get_theme_stylebox("panel").border_color = Color.FLORAL_WHITE 
@@ -42,7 +47,7 @@ func _on_case_mouse_exited():
 
 func _on_case_click(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		print(event)
+		emit_signal("case_clicked", self)
 
 #ACCESSORS :
 
@@ -51,4 +56,10 @@ func set_item(item) -> void:
 	
 func get_item():
 	return _item
+	
+func set_selected(value: bool) -> void:
+	_selected = value
+
+func get_selected() -> bool:
+	return _selected
 
