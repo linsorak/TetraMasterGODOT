@@ -33,14 +33,32 @@ func connect_cases(cases: Array[Case]) -> void:
 func connect_to_board():
 	if %Board:
 		%Board.connect("board_ready", Callable(self, "_on_card_selected"))
+		
+func unselect_card(ignored_card: Card) -> void:
+	for card in %Board.blue_deck:
+		if card != ignored_card:
+			card.set_selected(false)
+			
+	for card in %Board.red_deck:
+		if card != ignored_card:
+			card.set_selected(false)
 	
 func _on_card_selected(selected_card) -> void:
 	_selected_card = selected_card
+	unselect_cases()
+	%Board.cursor.visible = true
+	%Board.cursor.play()
+	%Board.cursor.position.y = selected_card.position.y + selected_card.get_height() / 2
+	%Board.cursor.position.x = selected_card.position.x	
+	unselect_card(selected_card)
 	print("Carte sélectionnée :", selected_card.numbers)
 	
 func _on_card_unselected(selected_card) -> void:
 	_selected_card = null
-	unselect_cases()
+	unselect_cases()	
+	%Board.cursor.visible = false	
+	%Board.cursor.stop()	
+	unselect_card(selected_card)
 	print("Carte désélectionnée :", selected_card.numbers)
 	
 func _on_case_can_be_selected(selected_case) -> void:
@@ -62,6 +80,9 @@ func _on_case_clicked(selected_case) -> void:
 		else:
 			_current_player = Card.COLOR.BLUE
 		emit_signal("current_player", _current_player)
+		%Board.cursor.stop()
+		%Board.cursor.visible = false		
+		selected_case.hide_border()
 
 func unselect_cases() -> void:
 	for case in %Board.cases:
@@ -133,7 +154,8 @@ func get_opposite_direction(direction: int) -> int:
 func processing_game(current_case: Case, is_combo = false) -> void:
 	var nearest_cases = get_nearest_cases(current_case)
 	var case_item = current_case.get_item()
-	var cases_fight = []
+	var queue_combos_fights = []
+	var queue_fights = []
 	
 	if case_item is Card:
 		for i in range(len(case_item.arrows)):
@@ -148,10 +170,93 @@ func processing_game(current_case: Case, is_combo = false) -> void:
 					
 					if direction_case_item is Card and direction_case_item.color != _current_player:
 						if direction_case_item.arrows[opposite_direction].visible == false:
-							direction_case_item.change_color(_current_player)
-							print(direction_case_item.get_power(direction_case_item.numbers[0]))
+							#direction_case_item.change_color(_current_player)
+							var data = {
+								"current_card": case_item,
+								"defense_card": direction_case_item,
+								"direction": i,
+								"opposite_direction": opposite_direction
+							}
+							queue_fights.append(data)
 						else:
 							if not is_combo:
-								cases_fight.append(direction_case_item)
+								var data = {
+									"current_card": case_item,
+									"defense_card": direction_case_item,
+									"direction": i,
+									"opposite_direction": opposite_direction
+								}
+								queue_combos_fights.append(data)
+								
+		if queue_combos_fights:
+			_processing_combo(queue_combos_fights)
+								
+func _processing_combo(queue: Array) -> void:
+	#P : Attaque physique.
+	#M : Attaque magique.
+	#X : Utilise la défense la plus faible de la carte adverse.
+	#A : Utilise le meilleur attribut de la carte en tant que puissance d'attaquer, et utilise l'attribut le plus faible de la carte adverse comme défense.	
+	for fight in queue:
+		var current_card = fight["current_card"]
+		var defense_card = fight["defense_card"]
+		var direction = fight["direction"]
+		var opposite_direction = fight["opposite_direction"]
 		
-	
+		if current_card.arrows[direction].visible and defense_card.arrows[opposite_direction].visible:		
+			var attacking_card_attack_force = current_card.get_node("attack_force")
+			var attacking_card_attack_type = current_card.get_node("attack_type")
+			var attacking_card_physical_defense = current_card.get_node("physical_defense")
+			var attacking_card_magical_defense = current_card.get_node("magical_defense")
+			var defense_card_attack_force = defense_card.get_node("attack_force")
+			var defense_card_physical_defense = defense_card.get_node("physical_defense")
+			var defense_card_magical_defense = defense_card.get_node("magical_defense")
+			
+			var attacking_card_attack = null
+			var attacking_card_attack_power = null
+			var defense_card_defense = null
+			var defense_card_defense_power = null
+			
+			match attacking_card_attack_type.text:
+				"P": 
+					attacking_card_attack = attacking_card_attack_force.text
+					defense_card_defense = defense_card_physical_defense.text		
+				"M": 
+					attacking_card_attack = attacking_card_attack_force.text
+					defense_card_defense = defense_card_magical_defense.text
+				"X": 
+					attacking_card_attack = attacking_card_attack_force.text
+					var hex_value_defense_card_physical_defense = defense_card_physical_defense.text.hex_to_int()
+					var hex_value_defense_card_magical_defense = defense_card_magical_defense.text.hex_to_int()
+					if hex_value_defense_card_physical_defense <= hex_value_defense_card_magical_defense:
+						defense_card_defense = defense_card_physical_defense.text
+					else:
+						defense_card_defense = defense_card_magical_defense.text
+				"A":
+					var hex_value_attacking_card_attack_force = attacking_card_attack_force.text.hex_to_int()
+					var hex_value_attacking_card_physical_defense = attacking_card_physical_defense.text.hex_to_int()
+					var hex_value_attacking_card_magical_defense = attacking_card_magical_defense.text.hex_to_int()
+					
+					if hex_value_attacking_card_attack_force >= hex_value_attacking_card_physical_defense:
+						attacking_card_attack = attacking_card_attack_force.text
+					elif hex_value_attacking_card_physical_defense >= hex_value_attacking_card_magical_defense:
+						attacking_card_attack = attacking_card_physical_defense.text
+					else:
+						attacking_card_attack = attacking_card_magical_defense.text					
+					
+					var hex_value_defense_card_attack_force = defense_card_attack_force.text.hex_to_int()
+					var hex_value_defense_card_physical_defense =defense_card_physical_defense.text.hex_to_int()
+					var hex_value_defense_card_magical_defense = defense_card_magical_defense.text.hex_to_int()
+					if hex_value_defense_card_attack_force <= hex_value_defense_card_physical_defense:
+						defense_card_defense = defense_card_attack_force.text
+					elif hex_value_defense_card_physical_defense <= hex_value_defense_card_magical_defense:
+						defense_card_defense = defense_card_physical_defense.text
+					else:
+						defense_card_defense = defense_card_magical_defense.text			
+			
+			attacking_card_attack_power = current_card.calculate_power(attacking_card_attack)			
+			defense_card_defense_power = defense_card.calculate_power(defense_card_defense)		
+			if attacking_card_attack_power["power"] >= defense_card_defense_power["power"]:
+				defense_card.change_color(current_card.color)
+			else:
+				current_card.change_color(defense_card.color)
+

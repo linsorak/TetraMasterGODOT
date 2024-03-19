@@ -14,6 +14,12 @@ var blue_deck: Array[Card]
 var red_deck: Array[Card]
 var cases: Array[Case]
 
+var cursor_scene: PackedScene
+var cursor: AnimatedSprite2D
+
+var coin_scene: PackedScene
+var coin: AnimatedSprite2D
+
 func _ready():
 	pass
 	
@@ -41,6 +47,15 @@ func init_board() -> void:
 	_generate_blocks()
 	_generate_decks(Card.COLOR.BLUE, blue_deck)
 	_generate_decks(Card.COLOR.RED, red_deck)
+	cursor_scene = load("res://Board/Cursor/Scenes/Cursor.tscn")
+	cursor = cursor_scene.instantiate()
+	cursor.visible = false
+	add_child(cursor)
+	
+	coin_scene = load("res://Board/Coin/Scenes/Coin.tscn")
+	coin = coin_scene.instantiate()
+	coin.visible = false
+	add_child(coin)	
 			
 func _generate_blocks() -> void:
 	var nb_blocks = randi_range(0, 6)

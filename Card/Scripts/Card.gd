@@ -19,7 +19,6 @@ var _arrow_img : Texture
 var arrows : Array[Sprite2D]
 var drag_position = Vector2.ZERO
 var numbers: Array[String]
-
 var _scale_w: float
 var _scale_h: float
 var _selected = false: set = set_selected, get = get_selected
@@ -174,8 +173,8 @@ func place_numbers() -> void:
 	var border_height = border.region_rect.size.y * _scale_h
 	var position_value = 0
 
-	for value in positions:
-		position_value += value
+	for value in heights:
+		position_value += value * 1.5
 	position_value = position_value / len(positions)
 	var offset_top = border_height - position_value
 
@@ -196,12 +195,14 @@ func _add_texture(img: Texture, sprite: Sprite2D, region: Rect2) -> void:
 
 func _generate_number(number_value: String) -> Label:
 	var number = Label.new()
-	var number_font = load("res://Fonts/kimberley.ttf")
+	var number_font = load("res://Fonts/Utendo-Semibold.ttf")
+	#var number_font = load("res://Fonts/kimberley.ttf")
 	number.add_theme_font_override("font", number_font)
-	number.add_theme_font_size_override("font_size", 125)
+	number.add_theme_font_size_override("font_size", 150)
 	number.add_theme_color_override("font_color", Color("F4AF11"))
 	number.add_theme_color_override("font_outline_color", Color("000000"))
-	number.add_theme_constant_override("outline_size", 35)
+	number.add_theme_constant_override("outline_size", 50)
+	#number.add_theme_constant_override("anti_aliased", true)
 	number.text = number_value
 	return number
 
@@ -223,7 +224,7 @@ func set_selected(value: bool) -> void:
 func get_selected() -> bool:
 	return _selected
 	
-func get_power(power_value: String) -> Vector2i:
+func get_power_range(power_value: String) -> Vector2i:
 	var power_list = [
 		{"power": "0", "min_value": 0, "max_value": 15},
 		{"power": "1", "min_value": 16, "max_value": 31},
@@ -248,16 +249,28 @@ func get_power(power_value: String) -> Vector2i:
 			return Vector2i(power["min_value"], power["max_value"])
 	
 	return Vector2i(power_list[0]["min_value"], power_list[0]["max_value"])
+	
+func calculate_power(power_value: String) -> Dictionary:
+	var power_value_vector = get_power_range(power_value)
+	var base_power = randi_range(power_value_vector.x, power_value_vector.y)
+	var substracted_power = randi_range(0, base_power)
+	var power = base_power - substracted_power
+	var result = {
+		"base_power": base_power,
+		"power": power
+	}
+	return result
 
 
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if get_can_be_selected():
+			print("Selected ", _selected)
 			if _selected:
 				emit_signal("card_unselected", self)
-				_selected = false
+				set_selected(false)
 			else:
 				emit_signal("card_selected", self)
-				_selected = true
+				set_selected(true)
 		else:
 			print("Can't be selected")

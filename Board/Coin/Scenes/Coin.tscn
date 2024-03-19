@@ -1,0 +1,72 @@
+[gd_scene load_steps=11 format=3 uid="uid://b5hbqsrfl0mkg"]
+
+[ext_resource type="Texture2D" uid="uid://cwn6uabc0sr7u" path="res://Board/Coin/Sprites/coin.png" id="1_6qn8a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hqjht"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(0, 0, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q46kk"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(182, 0, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x7rxo"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(364, 0, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nxviv"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(0, 173, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_operu"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(182, 173, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8lrgl"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(364, 173, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_50j4p"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(0, 346, 182, 173)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_deprj"]
+atlas = ExtResource("1_6qn8a")
+region = Rect2(182, 346, 182, 173)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ah1o7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hqjht")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q46kk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x7rxo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nxviv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_operu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8lrgl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_50j4p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_deprj")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="Coin" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_ah1o7")
+frame = 1
+frame_progress = 0.0506146

@@ -1,0 +1,63 @@
+[gd_scene load_steps=10 format=3 uid="uid://ch1i6hvwlxdwx"]
+
+[ext_resource type="Texture2D" uid="uid://dca6gn8mvs62f" path="res://Board/Cursor/Sprites/cursor.png" id="1_1d8ln"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5vokk"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(0, 0, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qm6wx"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(112, 0, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q4amm"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(224, 0, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xcvrx"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(0, 66, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7rnh6"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(112, 66, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0536y"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(224, 66, 112, 66)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yjq5t"]
+atlas = ExtResource("1_1d8ln")
+region = Rect2(0, 132, 112, 66)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_esxsd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vokk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qm6wx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q4amm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xcvrx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7rnh6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0536y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yjq5t")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[node name="Cursor" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_esxsd")

@@ -48,6 +48,9 @@ func _on_case_mouse_exited():
 func _on_case_click(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		emit_signal("case_clicked", self)
+		
+func hide_border() -> void:
+	$Panel.get_theme_stylebox("panel").border_color = Color.TRANSPARENT 
 
 #ACCESSORS :
 
