@@ -5,6 +5,9 @@ const NUM_CARDS: int = 5
 var _selected_card: Card
 var _current_player: Card.COLOR
 
+var queue_combos_fights = []
+var queue_fights = []
+
 signal current_player(_current_player: Card.COLOR)
 
 func _ready():
@@ -154,8 +157,8 @@ func get_opposite_direction(direction: int) -> int:
 func processing_game(current_case: Case, is_combo = false) -> void:
 	var nearest_cases = get_nearest_cases(current_case)
 	var case_item = current_case.get_item()
-	var queue_combos_fights = []
-	var queue_fights = []
+	queue_fights = []
+	queue_combos_fights = []
 	
 	if case_item is Card:
 		for i in range(len(case_item.arrows)):
@@ -188,8 +191,24 @@ func processing_game(current_case: Case, is_combo = false) -> void:
 								}
 								queue_combos_fights.append(data)
 								
-		if queue_combos_fights:
-			_processing_combo(queue_combos_fights)
+		if len(queue_combos_fights) > 1:
+			#_processing_combo(queue_combos_fights)
+			_ask_choose_card()
+			
+func _ask_choose_card() -> void:
+	var defense_cards = []
+	var current_card = null
+	for choose_card_data in queue_combos_fights:
+		if choose_card_data["defense_card"] != null:
+			defense_cards.append(choose_card_data["defense_card"])
+			current_card = choose_card_data["current_card"]
+			
+	for case in %Board.cases:
+		if case.get_item() is Card:
+			if case.get_item() not in defense_cards and case.get_item() != current_card and case.get_item().get_node("masking_rect").visible == false:
+				case.get_item().get_node("masking_rect").visible = true
+
+		
 								
 func _processing_combo(queue: Array) -> void:
 	#P : Attaque physique.

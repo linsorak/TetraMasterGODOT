@@ -54,6 +54,7 @@ func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array
 	add_child(power_label)
 	rescale()
 	update_power_label("????")
+	power_label.visible = false
 	set_illustration(card_illustration[0], card_illustration[1])
 	var collision_shape = $CollisionShape2D.shape as RectangleShape2D
 	if collision_shape == null:
@@ -79,6 +80,7 @@ func masking_shape() -> void:
 	masking_color_rect.material = masking_material
 	masking_color_rect.name = "masking_rect"
 	masking_color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	masking_color_rect.visible = false
 	add_child(masking_color_rect)
 
 
@@ -292,10 +294,15 @@ func calculate_power(power_value: String) -> Dictionary:
 	
 func update_power_label(value: String) -> void:
 	power_label.text = value
-	print(power_label.get_size().x)
 	var pos_x = (get_width() / 2) - ((power_label.get_size().x * _scale_w) / 2)
 	var pos_y = (get_height() / 2) - ((power_label.get_size().y * _scale_h) / 2)
 	power_label.position = Vector2(pos_x, pos_y)
+	
+func set_choose(value: bool) -> void:
+	var masking_rect = get_node("masking_rect")
+	
+	if masking_rect:
+		masking_rect.visible = true
 	
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -308,7 +315,7 @@ func _on_card_click(_viewport, event, _shape_idx):
 				emit_signal("card_selected", self)
 				set_selected(true)
 		else:
-			print("Can't be selected")
+			print("Can't be selected")			
 
 func _process(delta):
 	pass
