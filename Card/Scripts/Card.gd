@@ -17,12 +17,12 @@ var _card_sheet : Texture
 var _illustration_img : Texture
 var _arrow_img : Texture
 var arrows : Array[Sprite2D]
-var drag_position = Vector2.ZERO
 var numbers: Array[String]
 var _scale_w: float
 var _scale_h: float
 var _selected = false: set = set_selected, get = get_selected
 var _can_be_selected = false : set = set_can_be_selected, get = get_can_be_selected
+var power_label = null
 
 signal card_selected(selected_card)
 signal card_unselected(selected_card)
@@ -51,7 +51,10 @@ func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array
 	set_arrows(card_arrows)
 	initialize_numbers()
 	place_numbers()
+	power_label = _generate_power_label()
+	add_child(power_label)
 	rescale()
+	update_power_label("????")
 	set_illustration(card_illustration[0], card_illustration[1])
 	var collision_shape = $CollisionShape2D.shape as RectangleShape2D
 	if collision_shape == null:
@@ -198,13 +201,23 @@ func _generate_number(number_value: String) -> Label:
 	var number_font = load("res://Fonts/Utendo-Semibold.ttf")
 	#var number_font = load("res://Fonts/kimberley.ttf")
 	number.add_theme_font_override("font", number_font)
-	number.add_theme_font_size_override("font_size", 150)
+	number.add_theme_font_size_override("font_size", 130)
 	number.add_theme_color_override("font_color", Color("F4AF11"))
 	number.add_theme_color_override("font_outline_color", Color("000000"))
 	number.add_theme_constant_override("outline_size", 50)
 	#number.add_theme_constant_override("anti_aliased", true)
 	number.text = number_value
 	return number
+	
+func _generate_power_label() -> Label:
+	var power = Label.new()
+	var round_font = load("res://Fonts/round.ttf")
+	power.add_theme_font_override("font", round_font)
+	power.add_theme_font_size_override("font_size", 150)
+	power.add_theme_color_override("font_color", Color("f4c811"))
+	power.add_theme_color_override("font_outline_color", Color("000000"))
+	power.add_theme_constant_override("outline_size", 50)
+	return power
 
 func get_height() -> float:
 	return border.region_rect.size.y * _scale_h	
@@ -260,6 +273,14 @@ func calculate_power(power_value: String) -> Dictionary:
 		"power": power
 	}
 	return result
+	
+func update_power_label(value: String) -> void:
+	power_label.text = value
+	print(power_label.get_size().x)
+	var pos_x = (get_width() / 2) - ((power_label.get_size().x * _scale_w) / 2)
+	var pos_y = (get_height() / 2) - ((power_label.get_size().y * _scale_h) / 2)
+	power_label.position = Vector2(pos_x, pos_y)
+	
 
 
 func _on_card_click(_viewport, event, _shape_idx):
@@ -274,3 +295,6 @@ func _on_card_click(_viewport, event, _shape_idx):
 				set_selected(true)
 		else:
 			print("Can't be selected")
+
+func _process(delta):
+	pass
