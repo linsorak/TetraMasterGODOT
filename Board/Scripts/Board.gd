@@ -56,6 +56,7 @@ func init_board() -> void:
 	coin = coin_scene.instantiate()
 	coin.visible = false
 	add_child(coin)	
+	
 			
 func _generate_blocks() -> void:
 	var nb_blocks = randi_range(0, 6)

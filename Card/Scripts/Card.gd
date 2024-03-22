@@ -38,8 +38,7 @@ func _init():
 	add_child(border)	
 
 func _ready():
-	connect("input_event", Callable(self, "_on_card_click"))
-	
+	connect("input_event", Callable(self, "_on_card_click"))	
 
 func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array[String], card_illustration: Array[int], case_dimensions: Vector2) -> void:
 	color = card_color
@@ -62,7 +61,26 @@ func initialize(card_color: COLOR, card_arrows: Array[bool], card_numbers: Array
 		$CollisionShape2D.shape = collision_shape
 		
 	collision_shape.extents = Vector2(border.get_rect().size.x, border.get_rect().size.y) / 2
+	
 	$CollisionShape2D.position = Vector2(get_width(), get_height()) / 2 
+	masking_shape()
+	
+
+func masking_shape() -> void:
+	var masking_color_rect = ColorRect.new()
+	var masking_shader = load("res://Main/Shaders/masking.gdshader")
+	var masking_material = ShaderMaterial.new()
+	masking_material.shader = masking_shader
+	
+	masking_color_rect.color = Color(1, 1, 1)
+	masking_color_rect.position = border.get_rect().position
+	masking_color_rect.size = Vector2(border.get_rect().size.x * _scale_w, border.get_rect().size.y * _scale_h)
+	#masking_color_rect.size = border.get_rect().size
+	masking_color_rect.material = masking_material
+	masking_color_rect.name = "masking_rect"
+	masking_color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(masking_color_rect)
+
 
 func rescale() -> void:
 	for child in get_children():
@@ -199,13 +217,11 @@ func _add_texture(img: Texture, sprite: Sprite2D, region: Rect2) -> void:
 func _generate_number(number_value: String) -> Label:
 	var number = Label.new()
 	var number_font = load("res://Fonts/Utendo-Semibold.ttf")
-	#var number_font = load("res://Fonts/kimberley.ttf")
 	number.add_theme_font_override("font", number_font)
 	number.add_theme_font_size_override("font_size", 130)
 	number.add_theme_color_override("font_color", Color("F4AF11"))
 	number.add_theme_color_override("font_outline_color", Color("000000"))
 	number.add_theme_constant_override("outline_size", 50)
-	#number.add_theme_constant_override("anti_aliased", true)
 	number.text = number_value
 	return number
 	
@@ -281,8 +297,6 @@ func update_power_label(value: String) -> void:
 	var pos_y = (get_height() / 2) - ((power_label.get_size().y * _scale_h) / 2)
 	power_label.position = Vector2(pos_x, pos_y)
 	
-
-
 func _on_card_click(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if get_can_be_selected():
